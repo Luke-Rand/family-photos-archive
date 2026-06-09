@@ -1,0 +1,24 @@
+# Node.js dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Operating System files
+.DS_Store
+Thumbs.db
+
+# Generated gallery database
+gallery_data.js
+
+# Processed/optimized images
+photos/thumbnails/
+photos/previews/
+
+# Raw photos and sidecar metadata
+photos/*
+!photos/.gitkeep
+
+# Local configuration files (optional: comment out if you want to track config.json)
+# config.json

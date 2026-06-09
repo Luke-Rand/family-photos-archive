@@ -1,0 +1,12 @@
+{
+  "name": "littlefield-family-photos",
+  "version": "1.0.0",
+  "description": "Littlefield Family Photo Archive",
+  "scripts": {
+    "dev": "node server.js",
+    "optimize": "python optimize_photos.py"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}

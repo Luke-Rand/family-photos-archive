@@ -1,0 +1,22 @@
+{
+  "title": "The Littlefield Family Photo Archive",
+  "subtitle": "A collection of memories, scanned and edited from mounted 35mm slides.",
+  "description": "A beautifully curated, interactive web photo gallery containing chronological family photos scanned and digitized from mounted 35mm slides.",
+  "slide_label": "LITTLEFIELD FAMILY ARCHIVE",
+  "port": 8080,
+  "photos_dir": "photos",
+  "eras": [
+    {
+      "id": "1960s",
+      "label": "1960s",
+      "start_year": 1960,
+      "end_year": 1969
+    },
+    {
+      "id": "1970s",
+      "label": "1970s",
+      "start_year": 1970,
+      "end_year": 1979
+    }
+  ]
+}

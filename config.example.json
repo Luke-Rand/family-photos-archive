@@ -1,0 +1,22 @@
+{
+  "title": "Our Family Photo Archive",
+  "subtitle": "A collection of memories and scanned photographs.",
+  "description": "A beautifully curated web photo gallery for our family archive.",
+  "slide_label": "FAMILY ARCHIVE",
+  "port": 8080,
+  "photos_dir": "photos",
+  "eras": [
+    {
+      "id": "1980s",
+      "label": "1980s",
+      "start_year": 1980,
+      "end_year": 1989
+    },
+    {
+      "id": "1990s",
+      "label": "1990s",
+      "start_year": 1990,
+      "end_year": 1999
+    }
+  ]
+}

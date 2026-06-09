@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Family Photo Archive</title>
+  <meta name="description"
+    content="A beautifully curated, interactive web photo gallery containing chronological family photos.">
+  <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+
+  <!-- Main Layout Header -->
+  <header>
+    <div class="brand-badge" id="brand-badge">Family Archive</div>
+    <h1 id="main-title">Family Photo Archive</h1>
+    <p class="subtitle" id="main-subtitle">
+      A collection of memories.
+    </p>
+
+    <!-- Stats Banner -->
+    <div class="stats-bar" id="stats-bar">
+      <div class="stat-item" id="stat-photos">
+        <span class="stat-val" id="stat-photos-val">0</span>
+        <span class="stat-lbl">Photos</span>
+      </div>
+      <div class="stat-item" id="stat-span">
+        <span class="stat-val" id="stat-span-val">--</span>
+        <span class="stat-lbl">Years Covered</span>
+      </div>
+      <div class="stat-item" id="stat-people">
+        <span class="stat-val" id="stat-people-val">0</span>
+        <span class="stat-lbl">Tagged People</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Controls Panel (Sticky) -->
+  <main>
+    <div class="controls-container">
+      <div class="search-filter-card" id="search-filter-card">
+
+        <!-- Search bar input -->
+        <div class="search-wrapper">
+          <input type="text" id="search-input" class="search-input"
+            placeholder="Search by description, tag, person, or location (e.g. Robert, wedding, portrait)..."
+            aria-label="Search photos">
+          <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
+          </svg>
+          <button type="button" class="btn-toggle-filters" id="btn-toggle-filters" aria-expanded="false"
+            aria-controls="filters-collapsible">
+            <svg class="filter-toggle-icon" viewBox="0 0 24 24" aria-hidden="true"
+              style="width: 18px; height: 18px; fill: currentColor;">
+              <path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z" />
+            </svg>
+            <span>Filters</span>
+            <span class="filter-count-badge" id="filter-count-badge" style="display: none;">0</span>
+          </button>
+        </div>
+
+        <!-- Collapsible Filters Area -->
+        <div class="filters-collapsible" id="filters-collapsible">
+          <!-- Decade filter buttons -->
+          <div class="filter-row" id="decade-filter-row">
+            <span class="filter-label" id="decade-filter-label">Decade:</span>
+            <div class="btn-group" id="decade-button-group">
+              <!-- Dynamic era buttons injected here -->
+            </div>
+          </div>
+
+          <!-- Tag filtering list -->
+          <div class="filter-row" id="tag-filter-row">
+            <span class="filter-label" id="tag-filter-label">Tags:</span>
+            <div class="btn-group" id="tag-button-group">
+              <!-- Dynamic tags will be injected here -->
+            </div>
+          </div>
+
+          <!-- People filtering list -->
+          <div class="filter-row" id="people-filter-row">
+            <span class="filter-label" id="people-filter-label">People:</span>
+            <div class="btn-group" id="people-button-group">
+              <!-- Dynamic people will be injected here -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Options row -->
+        <div class="filter-row"
+          style="justify-content: space-between; border-top: 1px solid var(--border-light); padding-top: 16px; margin-top: 4px;">
+          <!-- Active search pills display -->
+          <div class="active-tags-display" id="active-filters-display">
+            <!-- Dynamic active filter tags shown here -->
+          </div>
+
+
+        </div>
+
+      </div>
+
+      <!-- Results stats -->
+      <div class="results-info" id="results-info" role="status">
+        Showing <span id="current-count">0</span> of <span id="total-count">0</span> photos
+      </div>
+    </div>
+
+    <!-- Photo Grid Gallery -->
+    <section class="gallery-grid-wrapper" aria-label="Photo Grid">
+      <div class="gallery-grid" id="gallery-grid">
+        <!-- Dynamic photo cards injected here -->
+      </div>
+    </section>
+  </main>
+
+  <!-- Fullscreen Lightbox Modal Dialog -->
+  <dialog class="lightbox" id="lightbox" aria-modal="true" aria-label="Photo Viewer">
+    <div class="lightbox-container" id="lightbox-container">
+      <!-- Stage / Image viewing section -->
+      <div class="lightbox-stage" id="lightbox-stage">
+
+        <!-- Close Button -->
+        <button class="lightbox-btn-close" id="lightbox-close" aria-label="Close Lightbox">
+          <svg class="icon" viewBox="0 0 24 24">
+            <path
+              d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+          </svg>
+        </button>
+
+        <!-- Navigation Buttons -->
+        <button class="lightbox-btn lightbox-btn-prev" id="lightbox-prev" aria-label="Previous Photo">
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+          </svg>
+        </button>
+
+        <!-- Dynamic polaroid/slide image mount wrapper -->
+        <div class="lightbox-img-wrapper" id="lightbox-img-wrapper" data-slide-label="LITTLEFIELD FAMILY ARCHIVE">
+          <img class="lightbox-img" id="lightbox-img" src="" alt="High resolution family archive slide preview">
+        </div>
+
+        <button class="lightbox-btn lightbox-btn-next" id="lightbox-next" aria-label="Next Photo">
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
+          </svg>
+        </button>
+
+      </div>
+
+      <!-- Detail/Meta Info Panel (scrollable) -->
+      <aside class="lightbox-info" id="lightbox-info">
+
+        <!-- VIEW CONTAINER -->
+        <div class="info-view-container" id="info-view-container"
+          style="display: flex; flex-direction: column; height: 100%; width: 100%;">
+
+          <div class="lightbox-info-header">
+            <span class="lightbox-date" id="lightbox-date">June 1970</span>
+            <h2 class="lightbox-subject" id="lightbox-subject">Baby in Rocking Chair</h2>
+          </div>
+
+          <div class="lightbox-info-body" style="flex-grow: 1;">
+            <!-- Location -->
+            <div id="lightbox-loc-section">
+              <h3 class="lightbox-section-title">Location</h3>
+              <p class="lightbox-desc" id="lightbox-location">N/A</p>
+            </div>
+
+            <!-- Description -->
+            <div id="lightbox-desc-section">
+              <h3 class="lightbox-section-title">Description</h3>
+              <p class="lightbox-desc" id="lightbox-description">N/A</p>
+            </div>
+
+            <!-- Tag pills -->
+            <div id="lightbox-tags-section">
+              <h3 class="lightbox-section-title">Tags</h3>
+              <div class="lightbox-pills-list" id="lightbox-tags-list">
+                <!-- Dynamic tag pills -->
+              </div>
+            </div>
+
+            <!-- People pills -->
+            <div id="lightbox-people-section">
+              <h3 class="lightbox-section-title">People Present</h3>
+              <div class="lightbox-pills-list" id="lightbox-people-list">
+                <!-- Dynamic people pills -->
+              </div>
+            </div>
+
+            <!-- Custom sidecar keys -->
+            <div id="lightbox-custom-section">
+              <h3 class="lightbox-section-title">Slide Metadata</h3>
+              <div id="lightbox-custom-list">
+                <!-- Dynamic custom keys -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Panel (Download & Edit) -->
+          <div class="lightbox-info-footer" style="display: flex; flex-direction: column; gap: 12px;">
+            <a class="btn-download" id="lightbox-download" href="" download
+              aria-label="Download high-resolution scanned file">
+              <svg class="icon" viewBox="0 0 24 24">
+                <path
+                  d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z" />
+              </svg>
+              Download Original High-Res
+            </a>
+            <button class="btn-filter" id="btn-open-edit"
+              style="width: 100%; padding: 12px; border-radius: var(--radius-sm); font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px;">
+              <svg class="icon" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
+                <path
+                  d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+              </svg>
+              Edit Annotations
+            </button>
+          </div>
+
+        </div>
+
+        <!-- EDIT CONTAINER -->
+        <div class="info-edit-container" id="info-edit-container"
+          style="display: none; flex-direction: column; height: 100%; width: 100%;">
+
+          <div class="lightbox-info-header">
+            <span class="lightbox-date">Editing Mode</span>
+            <h2 class="lightbox-subject" style="font-size: 1.4rem;">Modify slide annotations</h2>
+          </div>
+
+          <div class="lightbox-info-body"
+            style="flex-grow: 1; display: flex; flex-direction: column; gap: 16px; overflow-y: auto;">
+            <div>
+              <label class="lightbox-section-title" for="edit-subject">Subject / Title</label>
+              <input type="text" id="edit-subject" class="edit-input">
+            </div>
+            <div>
+              <label class="lightbox-section-title" for="edit-date">Date (Month Year)</label>
+              <input type="text" id="edit-date" class="edit-input" placeholder="e.g. June 1970">
+            </div>
+            <div>
+              <label class="lightbox-section-title" for="edit-location">Location</label>
+              <input type="text" id="edit-location" class="edit-input">
+            </div>
+            <div>
+              <label class="lightbox-section-title" for="edit-description">Description</label>
+              <textarea id="edit-description" class="edit-input edit-textarea"></textarea>
+            </div>
+            <div>
+              <label class="lightbox-section-title">People Present</label>
+              <div class="edit-tags-container" id="edit-people-list">
+                <!-- Editable people pills -->
+              </div>
+              <div class="add-tag-wrapper autocomplete-wrapper">
+                <input type="text" id="add-person-input" class="add-tag-input" placeholder="Add person (Press Enter)..."
+                  autocomplete="off">
+                <div class="autocomplete-suggestions" id="add-person-suggestions" style="display: none;"></div>
+              </div>
+            </div>
+            <div>
+              <label class="lightbox-section-title">Tags</label>
+              <div class="edit-tags-container" id="edit-tags-list">
+                <!-- Editable tag pills -->
+              </div>
+              <div class="add-tag-wrapper autocomplete-wrapper">
+                <input type="text" id="add-tag-input" class="add-tag-input" placeholder="Add tag (Press Enter)..."
+                  autocomplete="off">
+                <div class="autocomplete-suggestions" id="add-tag-suggestions" style="display: none;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Edit Actions -->
+          <div class="lightbox-info-footer" style="display: flex; flex-direction: row; gap: 12px;">
+            <button class="btn-download" id="btn-save-edit"
+              style="background-color: var(--accent-sage); box-shadow: 0 4px 14px rgba(90, 126, 107, 0.25); flex: 1; padding: 12px 16px;">Save</button>
+            <button class="btn-filter" id="btn-cancel-edit"
+              style="flex: 1; padding: 12px 16px; border-radius: var(--radius-sm); font-weight: 600;">Cancel</button>
+          </div>
+
+        </div>
+
+      </aside>
+
+    </div>
+  </dialog>
+
+  <!-- Script Imports -->
+  <script src="gallery_data.js"></script>
+  <script src="index.js" defer></script>
+</body>
+
+</html>
