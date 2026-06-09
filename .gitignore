@@ -21,4 +21,4 @@ photos/*
 !photos/.gitkeep
 
 # Local configuration files (optional: comment out if you want to track config.json)
-# config.json
+config.json

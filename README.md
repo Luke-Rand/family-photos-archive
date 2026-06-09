@@ -98,6 +98,46 @@ Open your browser and navigate to `http://localhost:8080` (or your configured po
 
 ---
 
+## Running with Docker
+
+You can package and run this application inside a Docker container. The container will automatically run the image optimizer on startup before launching the server.
+
+### Using Docker Compose (Recommended)
+
+1. Make sure you have a `config.json` in the project root. (You can copy `config.example.json` to `config.json`).
+2. Start the container in the background:
+   ```bash
+   docker compose up -d
+   ```
+3. Open your browser and navigate to `http://localhost:8080`.
+
+Your local `photos` directory and `config.json` are mounted as volumes so that any metadata changes or added images persist on your host machine.
+
+### Using Docker Commands Directly
+
+If you prefer building and running manually:
+
+1. Build the image:
+   ```bash
+   docker build -t family-photos-archive .
+   ```
+
+2. Run the container:
+   ```bash
+   docker run -d \
+     --name family-photos-archive \
+     -p 8080:8080 \
+     -v "$(pwd)/photos:/app/photos" \
+     -v "$(pwd)/config.json:/app/config.json" \
+     family-photos-archive
+   ```
+
+### GitHub Actions CI/CD
+
+This repository contains a GitHub Actions workflow configuration (found in `.github/workflows/docker-build.yml`) that automatically builds and pushes a multi-architecture (`linux/amd64` and `linux/arm64`) Docker image to GitHub Container Registry (GHCR) when pushes are made to `main`/`master` or when version tags are pushed.
+
+---
+
 ## Metadata Structure (Sidecars)
 
 Each photo in your archive can have an optional sidecar `.json` file containing metadata. For example, `IMG_0001.jpg` can have a sidecar file named `IMG_0001.json` structured as follows:
