@@ -1,0 +1,34 @@
+# Version control
+.git
+.gitignore
+.github
+
+# Node dependencies and logs
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Python caches and local virtualenvs
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv
+venv
+env
+
+# Operating System files
+.DS_Store
+Thumbs.db
+
+# Local configuration files
+config.json
+
+# Local photo assets and generated database
+# We exclude the photos folder contents so the image remains small,
+# but we allow the directories to be mounted as volumes at runtime.
+photos/*
+!photos/.gitkeep
+gallery_data.js

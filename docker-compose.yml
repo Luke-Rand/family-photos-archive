@@ -1,0 +1,15 @@
+services:
+  app:
+    build: .
+    container_name: family-photos-archive
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./photos:/app/photos
+      # Mount the configuration file. If you haven't created config.json yet,
+      # copy config.example.json to config.json before starting the container
+      # to prevent Docker from creating a config.json directory on the host.
+      - ./config.json:/app/config.json
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
