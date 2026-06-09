@@ -47,8 +47,14 @@ header {
   gap: 16px;
 }
 
+.header-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
 .brand-badge {
-  align-self: flex-start;
   background-color: rgba(211, 107, 87, 0.1);
   color: var(--accent-terracotta);
   font-weight: 700;
@@ -57,6 +63,31 @@ header {
   text-transform: uppercase;
   padding: 6px 16px;
   border-radius: 100px;
+}
+
+.btn-logout {
+  background-color: transparent;
+  border: 1px solid var(--border-light);
+  color: var(--text-muted);
+  padding: 6px 16px;
+  border-radius: 100px;
+  font-family: var(--font-family);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.btn-logout:hover {
+  border-color: var(--accent-terracotta);
+  color: var(--accent-terracotta);
+  background-color: rgba(211, 107, 87, 0.02);
+}
+
+.btn-logout:focus {
+  outline: none;
+  border-color: var(--accent-terracotta);
+  box-shadow: 0 0 0 3px rgba(211, 107, 87, 0.15);
 }
 
 h1 {

@@ -125,6 +125,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // Apply configuration to elements
     applyConfiguration();
 
+    // Show and bind logout button if password protection is active
+    if (state.config.password_protected) {
+      const logoutBtn = document.getElementById('btn-logout');
+      if (logoutBtn) {
+        logoutBtn.style.display = 'inline-block';
+        logoutBtn.addEventListener('click', handleLogout);
+      }
+    }
+
     // Render Era buttons dynamically
     renderEraButtons();
 
@@ -142,6 +151,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 4. Bind Event Listeners
     bindEvents();
+  }
+
+  async function handleLogout() {
+    try {
+      const response = await fetch('/api/logout', {
+        method: 'POST'
+      });
+      if (response.ok) {
+        window.location.reload();
+      } else {
+        alert("Failed to log out. Please try again.");
+      }
+    } catch (err) {
+      console.error("Logout error:", err);
+      alert("Network error during logout.");
+    }
   }
 
   function applyConfiguration() {

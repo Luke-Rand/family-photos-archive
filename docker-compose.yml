@@ -12,4 +12,5 @@ services:
       - ./config.json:/app/config.json
     environment:
       - NODE_ENV=production
+      # - SITE_PASSWORD=my-secret-password
     restart: unless-stopped

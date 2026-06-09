@@ -6,6 +6,7 @@ const path = require('path');
 let PORT = 8080;
 let PHOTOS_DIR = path.join(__dirname, 'photos');
 let archiveTitle = 'Family Photo Archive';
+let sitePassword = process.env.SITE_PASSWORD || '';
 
 const configPath = path.join(__dirname, 'config.json');
 if (fs.existsSync(configPath)) {
@@ -18,10 +19,254 @@ if (fs.existsSync(configPath)) {
         : path.join(__dirname, config.photos_dir);
     }
     if (config.title) archiveTitle = config.title;
+    if (config.password) sitePassword = config.password;
   } catch (err) {
     console.error("Warning: Could not parse config.json:", err.message);
   }
 }
+
+// Session store for simple authentication
+const sessions = new Set();
+
+// Helper to parse cookies
+function parseCookies(request) {
+  const list = {};
+  const rc = request.headers.cookie;
+  if (rc) {
+    rc.split(';').forEach(cookie => {
+      const parts = cookie.split('=');
+      list[parts.shift().trim()] = decodeURI(parts.join('='));
+    });
+  }
+  return list;
+}
+
+// Self-contained login page
+const LOGIN_PAGE_HTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Family Photo Archive</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #FAF9F6;
+      --card-bg: #FFFFFF;
+      --text-main: #2D2A2A;
+      --text-muted: #6E6A6A;
+      --accent-terracotta: #D36B57;
+      --accent-terracotta-hover: #C25A46;
+      --border-light: #EAE8E3;
+      --radius-md: 16px;
+      --shadow-lg: 0 16px 48px rgba(45, 42, 42, 0.16);
+      --font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      background: linear-gradient(135deg, #F4F1EA 0%, #FAF9F6 50%, #ECE7DF 100%);
+      color: var(--text-main);
+      font-family: var(--font-family);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .login-container {
+      width: 100%;
+      max-width: 420px;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 40px;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      text-align: center;
+      position: relative;
+    }
+
+    .login-container::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: var(--radius-md);
+      border: 8px solid rgba(255, 255, 255, 0.5);
+      pointer-events: none;
+    }
+    
+    .logo-badge {
+      align-self: center;
+      background-color: rgba(211, 107, 87, 0.1);
+      color: var(--accent-terracotta);
+      font-weight: 700;
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 6px 16px;
+      border-radius: 100px;
+      width: fit-content;
+    }
+    
+    h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      background: linear-gradient(135deg, var(--text-main) 30%, var(--accent-terracotta));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+    
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      text-align: left;
+    }
+    
+    label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1.5px solid var(--border-light);
+      border-radius: 8px;
+      font-family: var(--font-family);
+      font-size: 1rem;
+      background-color: rgba(250, 249, 246, 0.8);
+      color: var(--text-main);
+      transition: all 0.3s ease;
+    }
+    
+    input:focus {
+      outline: none;
+      border-color: var(--accent-terracotta);
+      background-color: #FFFFFF;
+      box-shadow: 0 0 0 4px rgba(211, 107, 87, 0.15);
+    }
+    
+    button {
+      width: 100%;
+      background-color: var(--accent-terracotta);
+      color: #FFFFFF;
+      border: none;
+      padding: 14px 20px;
+      border-radius: 8px;
+      font-family: var(--font-family);
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(211, 107, 87, 0.2);
+    }
+    
+    button:hover {
+      background-color: var(--accent-terracotta-hover);
+      box-shadow: 0 6px 16px rgba(211, 107, 87, 0.35);
+      transform: translateY(-1px);
+    }
+    
+    button:active {
+      transform: translateY(0);
+    }
+    
+    .error-msg {
+      color: #D32F2F;
+      font-size: 0.85rem;
+      font-weight: 500;
+      display: none;
+      text-align: center;
+      background: rgba(211, 47, 47, 0.05);
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid rgba(211, 47, 47, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="logo-badge">Archive Locked</div>
+    <h1 id="archive-title">Family Photo Archive</h1>
+    <p>This archive is password protected. Please enter the password below to access the memories.</p>
+    
+    <div class="error-msg" id="error-msg">Incorrect password. Please try again.</div>
+    
+    <form id="login-form" onsubmit="handleLogin(event)">
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Enter password" required autofocus>
+      </div>
+      <button type="submit" style="margin-top: 12px;">Unlock Archive</button>
+    </form>
+  </div>
+
+  <script>
+    fetch('config.json')
+      .then(res => res.json())
+      .then(config => {
+        if (config.title) {
+          document.getElementById('archive-title').textContent = config.title;
+          document.title = 'Login - ' + config.title;
+        }
+      })
+      .catch(err => console.log('Could not load config.json title.'));
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const password = document.getElementById('password').value;
+      const errorMsg = document.getElementById('error-msg');
+      errorMsg.style.display = 'none';
+      
+      try {
+        const response = await fetch('/api/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ password })
+        });
+        
+        if (response.ok) {
+          window.location.reload();
+        } else {
+          const data = await response.json().catch(() => ({}));
+          errorMsg.textContent = data.error || 'Incorrect password. Please try again.';
+          errorMsg.style.display = 'block';
+        }
+      } catch (err) {
+        errorMsg.textContent = 'Server connection error. Please try again.';
+        errorMsg.style.display = 'block';
+      }
+    }
+  </script>
+</body>
+</html>`;
 
 // Helper to determine content type
 function getContentType(filePath) {
@@ -147,9 +392,110 @@ function regenerateGalleryData() {
     throw err;
   }
 }
-
 // Server handler
 const server = http.createServer((req, res) => {
+  const isProtected = sitePassword && sitePassword.trim() !== '';
+  const cookies = parseCookies(req);
+  const isAuthenticated = !isProtected || sessions.has(cookies['session_token']);
+
+  // Handle Login POST
+  if (req.method === 'POST' && req.url === '/api/login') {
+    let body = '';
+    req.on('data', chunk => {
+      body += chunk.toString();
+    });
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(body);
+        const { password } = payload;
+        if (isProtected && password === sitePassword) {
+          const token = Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2);
+          sessions.add(token);
+          res.writeHead(200, {
+            'Set-Cookie': `session_token=${token}; HttpOnly; Path=/; Max-Age=2592000; SameSite=Lax`,
+            'Content-Type': 'application/json'
+          });
+          res.end(JSON.stringify({ success: true }));
+        } else {
+          res.writeHead(401, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: "Incorrect password. Please try again." }));
+        }
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: "Invalid request payload" }));
+      }
+    });
+    return;
+  }
+
+  // Handle Logout POST
+  if (req.method === 'POST' && req.url === '/api/logout') {
+    const token = cookies['session_token'];
+    if (token) {
+      sessions.delete(token);
+    }
+    res.writeHead(200, {
+      'Set-Cookie': 'session_token=; HttpOnly; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax',
+      'Content-Type': 'application/json'
+    });
+    res.end(JSON.stringify({ success: true }));
+    return;
+  }
+
+  const decodedUrl = req.url.split('?')[0];
+  let checkUrl = decodedUrl.startsWith('/') ? decodedUrl.substring(1) : decodedUrl;
+  try {
+    checkUrl = decodeURIComponent(checkUrl);
+  } catch (e) {}
+
+  // Intercept config.json to strip password and add protection status flag
+  if (checkUrl === 'config.json') {
+    const filePath = path.join(__dirname, 'config.json');
+    fs.readFile(filePath, 'utf8', (err, data) => {
+      if (err) {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          title: archiveTitle,
+          password_protected: isProtected
+        }));
+        return;
+      }
+      try {
+        const configObj = JSON.parse(data);
+        delete configObj.password;
+        configObj.password_protected = isProtected;
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(configObj));
+      } catch (e) {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          title: archiveTitle,
+          password_protected: isProtected
+        }));
+      }
+    });
+    return;
+  }
+
+  // Authentication gate
+  if (!isAuthenticated) {
+    // Determine if it's a request for an HTML page or root navigation
+    const isHtmlRequest = decodedUrl === '/' || 
+                          decodedUrl.endsWith('/') || 
+                          decodedUrl.endsWith('.html') || 
+                          decodedUrl.endsWith('.htm') || 
+                          !decodedUrl.includes('.'); // path without extensions like /gallery
+    if (isHtmlRequest) {
+      res.writeHead(200, { 'Content-Type': 'text/html' });
+      res.end(LOGIN_PAGE_HTML);
+    } else {
+      res.writeHead(401, { 'Content-Type': 'text/plain' });
+      res.end('401 Unauthorized');
+    }
+    return;
+  }
+
+  // If authenticated (or not protected), proceed with standard request routing
   if (req.method === 'POST' && req.url === '/api/update-metadata') {
     let body = '';
     req.on('data', chunk => {

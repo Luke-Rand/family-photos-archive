@@ -5,6 +5,7 @@
   "slide_label": "FAMILY ARCHIVE",
   "port": 8080,
   "photos_dir": "photos",
+  "password": "",
   "eras": [
     {
       "id": "1980s",
